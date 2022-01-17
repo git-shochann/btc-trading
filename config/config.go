@@ -10,6 +10,7 @@ import (
 type ConfigList struct {
 	ApiKey string
 	ApiSecret string
+	LogFile string
 }
 
 var Config ConfigList // グローバルで呼び出せるようにする
@@ -23,5 +24,6 @@ func init() {
 	Config = ConfigList{
 		cfg.Section("bitflyer").Key("api_key").String(),
 		cfg.Section("bitflyer").Key("api_secret").String(),
+		cfg.Section("gotrading").Key("log_file").String(),
     }
 }
