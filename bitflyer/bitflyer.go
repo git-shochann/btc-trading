@@ -4,8 +4,6 @@ import (
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/hex"
-	"fmt"
-	"log"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -14,40 +12,40 @@ import (
 
 const baseURL = "https://api.bitflyer.com/v1"
 
+// 変数の集合体 -> 型
 type APIClient struct {
-	key string
-	secret string
-	httpClient *http.Client // ストラクトのポインタ型？ -> これをどう使おうと思える頭になるのか？
+	Key string
+	Secret string
+	HttpClient *http.Client // 構造体型の中に構造体型
 }
 
 // headerを追加する処理
-func(api APIClient) header(method, endpoint string, body []byte) map[string]string {
-	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
-	log.Println(timestamp)
-	
+func(api *APIClient) Header(method, endpoint string, body []byte) map[string]string {
+	timestamp := strconv.FormatInt(time.Now().Unix(), 10) // stringに変換
 	message := timestamp + method + endpoint + string(body)
-	fmt.Println(message)
 
-	mac := hmac.New(sha256.New, []byte(api.secret))
+	mac := hmac.New(sha256.New, []byte(api.Secret))
+
 	mac.Write([]byte(message))
-	fmt.Println(mac)
 
-	sign := hex.EncodeToString(mac.Sum(nil)) // これは何をしてる？
-
-	return map[string]string {
-		"ACCESS-KEY": api.key,
-		"ACCESS-TIMESTAMP": timestamp,
-		"ACCESS-SIGN": sign,
-		"Content-Type" : "application/json",
+	sign := hex.EncodeToString(mac.Sum(nil))
+	return map[string]string{
+		"ACCESS_KEY" :	api.Key,
+		"ACCESS-TIMESTAMP" : timestamp,
+		"ACCESS-SIGN" : sign,
+		"CONTENT-TYPE" : "application/json",
 	}
+	
 }
 
-// requestを投げる
-func (api *APIClient) doRequest(method, urlPath string, query [string]string, data []byte) (body[]byte, err error){
-	baseURL := url.Parse(baseURL)
-	if err := nil {
+func(api *APIClient) doRequest(method, urlPath string, query map[string]string, data[]byte) (body []byte, err error) {
+	baseURL, err := url.Parse(baseURL)
+	if err != nil {
 		return
 	}
 	apiURL, err := url.Parse(urlPath)
-
+	if err != nil {
+		return
+	}
+	endpoint := baseURL.ResolveReference(apiURL)
 }
